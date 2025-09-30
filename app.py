@@ -1,5 +1,5 @@
 import os
-from flask import Flask,render_template,request,redirect,session
+from flask import Flask,render_template,request,redirect,session,flash
 
 from db import Database
 from api import ner as perform_ner_api, sentiment as perform_sentiment_api, summarization as perform_summarization_api
@@ -26,9 +26,11 @@ def perform_registeration():
 
     response = dbo.insert(name, email, password)
     if response:
-        return render_template('login.html', message="User registered successfully, Please login", show_nav=False) 
-    else:   
-        return render_template('register.html', message="User already exists, Please try with different email", show_nav=False)
+        flash('User registered successfully, Please login', 'success')
+        return redirect('/')
+    else:
+        flash('User already exists, Please try with different email', 'error')
+        return redirect('/register')
     
 @app.route('/perform_login', methods=['POST'])
 def perform_login():
@@ -39,9 +41,11 @@ def perform_login():
 
     if response:
         session['user'] = email
+        flash('Login successful', 'success')
         return redirect('/profile')
     else:
-        return render_template('login.html', message="Invalid Credentials, Please try again", show_nav=False)
+        flash('Invalid Credentials, Please try again', 'error')
+        return redirect('/')
 
 @app.route('/profile')
 def profile():

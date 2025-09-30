@@ -1,50 +1,136 @@
-# NLP_WEB_APP
+# NLP Web App
 
-A small Flask app demonstrating simple user registration/login and NLP features using NLP Cloud.
+A Flask-based web application that provides user authentication and integrates with NLP Cloud to offer Named Entity Recognition (NER), Sentiment Analysis, and Text Summarization services.
 
-Features
-- User registration/login backed by a JSON file (for demo only).
-- NER (Named Entity Recognition) endpoint using NLP Cloud.
-- Sentiment analysis endpoint using NLP Cloud (supports optional `target`).
-- Summarization endpoint using NLP Cloud (size options).
-- Simple CSS for improved layout.
+## Features
 
-Quick start
-1. Create a virtualenv and install dependencies (the project uses Python 3.13+):
+- **User Authentication**: Secure login and registration system with session management.
+- **Named Entity Recognition (NER)**: Extract entities from text using NLP Cloud.
+- **Sentiment Analysis**: Analyze sentiment in text, with optional target specification.
+- **Text Summarization**: Summarize text in small, medium, or large sizes.
+- **Responsive UI**: Clean, user-friendly interface with CSS styling.
+- **Deployment Ready**: Configured for production deployment on platforms like Render.
 
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt  # or `pip install nlpcloud flask`
+## Prerequisites
+
+- Python 3.8 or higher
+- NLP Cloud API key (sign up at [nlpcloud.com](https://nlpcloud.com))
+
+## Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd nlp-web-app
+   ```
+
+2. **Create a virtual environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Configuration
+
+Create a `.env` file in the root directory and set the following environment variables:
+
+```env
+NLPCLOUD_API_KEY=your_nlpcloud_api_key_here
+SECRET_KEY=your_secret_key_here
 ```
 
-2. Set your NLP Cloud API key and optional config in environment variables (recommended):
+- `NLPCLOUD_API_KEY`: Your NLP Cloud API key.
+- `SECRET_KEY`: A secure random string for Flask session management.
 
-```bash
-export NLPCLOUD_API_KEY="your_api_key_here"
-export NLPCLOUD_MODEL="finetuned-llama-3-70b"
-export NLPCLOUD_GPU="True"
+Optional environment variables:
+- `NLPCLOUD_MODEL`: Default model (default: finetuned-llama-3-70b)
+- `NLPCLOUD_GPU`: Use GPU (default: True)
+
+## Usage
+
+1. **Run the application**:
+   ```bash
+   python app.py
+   ```
+
+2. **Access the app**:
+   - Open http://127.0.0.1:5000 in your browser
+   - Register a new account or login
+   - Navigate to NER, Sentiment, or Summarization pages
+
+## Deployment
+
+This app is configured for deployment on Render:
+
+1. Push your code to a Git repository (GitHub/GitLab).
+2. Create a new Web Service on Render.
+3. Connect your repository.
+4. Set build command: `pip install -r requirements.txt`
+5. Set start command: `gunicorn app:app`
+6. Add environment variables in Render dashboard:
+   - `NLPCLOUD_API_KEY`
+   - `SECRET_KEY`
+   - `PORT` (automatically set by Render)
+
+## Project Structure
+
+```
+nlp-web-app/
+├── app.py                 # Main Flask application
+├── api.py                 # NLP Cloud API integration
+├── db.py                  # User database management
+├── requirements.txt       # Python dependencies
+├── Procfile               # Render deployment configuration
+├── .gitignore             # Git ignore rules
+├── .env                   # Environment variables (not committed)
+├── static/
+│   └── style.css          # CSS styles
+├── templates/
+│   ├── base.html          # Base template
+│   ├── login.html         # Login page
+│   ├── register.html      # Registration page
+│   ├── profile.html       # User profile
+│   ├── ner.html           # NER interface
+│   ├── sentiment.html     # Sentiment analysis interface
+│   └── summarization.html  # Summarization interface
+└── users.json             # User data (demo only)
 ```
 
-3. Run the app:
+## API Endpoints
 
-```bash
-python app.py
-```
+- `GET /`: Login page
+- `POST /perform_login`: User login
+- `POST /perform_registeration`: User registration
+- `GET /profile`: User profile (authenticated)
+- `GET /ner`: NER page (authenticated)
+- `POST /perform_ner`: Perform NER
+- `GET /sentiment`: Sentiment page (authenticated)
+- `POST /perform_sentiment`: Perform sentiment analysis
+- `GET /summarization`: Summarization page (authenticated)
+- `POST /perform_summarization`: Perform summarization
+- `GET /logout`: Logout
 
-4. Open the app in your browser:
-- http://127.0.0.1:5000/ — Login/Register
-- http://127.0.0.1:5000/ner — NER form
-- http://127.0.0.1:5000/sentiment — Sentiment form
-- http://127.0.0.1:5000/summarization — Summarization form
+## Security Notes
 
-Notes
-- The app stores users in `users.json` for demo purposes. Do not use this in production.
-- Keep your `NLPCLOUD_API_KEY` secret. Do not check it into git; .env is ignored by `.gitignore`.
-- If the NLP Cloud service returns 429 Too Many Requests, you may be rate-limited. Upgrade your plan or use a mock mode (not included).
+- User passwords are stored in plain text in `users.json` for demo purposes only.
+- In production, use proper password hashing (e.g., with bcrypt).
+- The `.env` file is ignored by git; never commit sensitive data.
+- Rate limiting may apply based on your NLP Cloud plan.
 
-Next steps
-- Improve security: password hashing, input validation, and session management.
-- Replace JSON file with a proper DB (SQLite/Postgres).
-- Add mock/offline mode for NLP testing.
+## Contributing
+
+1. Fork the repository.
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit changes: `git commit -am 'Add feature'`
+4. Push to branch: `git push origin feature-name`
+5. Submit a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 

@@ -1,5 +1,6 @@
 import json
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Database:
     def insert(self, name, email, password):
@@ -14,18 +15,19 @@ class Database:
         if email in users:
             return 0
         else:
-            users[email] = [name, password]
+            hashed_password = generate_password_hash(password)
+            users[email] = [name, hashed_password]
 
         with open('users.json', 'w') as wf:
             json.dump(users, wf, indent=4)
             return 1
-    
-    def search(self, email,password):
+
+    def search(self, email, password):
         with open('users.json', 'r') as rf:
             users = json.load(rf)
 
             if email in users:
-                if users[email][1] == password:
+                if check_password_hash(users[email][1], password):
                     return 1
                 else:
                     return 0
