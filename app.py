@@ -1,9 +1,10 @@
-from flask import Flask,render_template,request,redirect
+from flask import Flask,render_template,request,redirect,session
 
 from db import Database
 from api import ner as perform_ner_api, sentiment as perform_sentiment_api, summarization as perform_summarization_api
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'default_secret_key')
 
 dbo = Database()
 
@@ -36,20 +37,29 @@ def perform_login():
     response = dbo.search(email, password)
 
     if response:
+        session['user'] = email
         return redirect('/profile')
     else:
         return render_template('login.html', message="Invalid Credentials, Please try again", show_nav=False)
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html')
+    if 'user' not in session:
+        return redirect('/')
+    user = session['user']
+    return render_template('profile.html', user=user)
 
 @app.route('/ner')
 def ner():
-    return render_template('ner.html')
+    if 'user' not in session:
+        return redirect('/')
+    user = session['user']
+    return render_template('ner.html', user=user)
 
 @app.route('/perform_ner', methods=['POST'])
 def perform_ner():
+    if 'user' not in session:
+        return redirect('/')
     text = request.form.get('ner_text')
     # call the nlpcloud NER helper; optionally pass searched_entity
     searched_entity = request.form.get('searched_entity')
@@ -66,15 +76,20 @@ def perform_ner():
             msg = "NER failed; please try again later."
         # log full error server-side for debugging
         print('NER error:', repr(e))
-        return render_template('ner.html', message=msg)
+        return render_template('ner.html', message=msg, user=session['user'])
 
-    return render_template('ner.html', message="NER performed successfully on the given text", entities=entities)
+    return render_template('ner.html', message="NER performed successfully on the given text", entities=entities, user=session['user'])
 
 @app.route('/sentiment')
 def sentiment():
-    return render_template('sentiment.html')
+    if 'user' not in session:
+        return redirect('/')
+    user = session['user']
+    return render_template('sentiment.html', user=user)
 @app.route('/perform_sentiment', methods=['POST'])
 def perform_sentiment():
+    if 'user' not in session:
+        return redirect('/')
     text = request.form.get('sentiment_text')
     target = request.form.get('sentiment_target')
     try:
@@ -84,17 +99,22 @@ def perform_sentiment():
         if hasattr(e, 'response') and getattr(e.response, 'status_code', None) == 429:
             msg = "Instance quota exceeded; please try again later."
         print('Sentiment error:', repr(e))
-        return render_template('sentiment.html', message=msg)
-    return render_template('sentiment.html', message="Sentiment performed", result=result)
+        return render_template('sentiment.html', message=msg, user=session['user'])
+    return render_template('sentiment.html', message="Sentiment performed", result=result, user=session['user'])
 
 
 @app.route('/summarization')
 def summarization():
-    return render_template('summarization.html')
+    if 'user' not in session:
+        return redirect('/')
+    user = session['user']
+    return render_template('summarization.html', user=user)
 
 
 @app.route('/perform_summarization', methods=['POST'])
 def perform_summarization():
+    if 'user' not in session:
+        return redirect('/')
     text = request.form.get('summ_text')
     size = request.form.get('size') or 'small'
     try:
@@ -104,8 +124,13 @@ def perform_summarization():
         if hasattr(e, 'response') and getattr(e.response, 'status_code', None) == 429:
             msg = "Instance quota exceeded; please try again later."
         print('Summarization error:', repr(e))
-        return render_template('summarization.html', message=msg)
-    return render_template('summarization.html', message="Summarization complete", result=result)
+        return render_template('summarization.html', message=msg, user=session['user'])
+    return render_template('summarization.html', message="Summarization complete", result=result, user=session['user'])
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect('/')
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))

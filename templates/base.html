@@ -16,6 +16,9 @@
                 <a href="/ner">NER</a>
                 <a href="/sentiment">Sentiment</a>
                 <a href="/summarization">Summarization</a>
+                {% if user %}
+                <a href="/logout">Logout</a>
+                {% endif %}
             </nav>
             {% endif %}
         </div>
