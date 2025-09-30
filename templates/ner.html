@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}NER — NLP App{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Named Entity Recognition</h1>
+    <form action="/perform_ner" method="post">
+        <label>Type your text here:</label>
+        <textarea name="ner_text">{{ request.form.ner_text or '' }}</textarea>
+
+        <label>Search entity (optional):</label>
+        <input type="text" name="searched_entity" placeholder="e.g. programming languages" value="{{ request.form.searched_entity or '' }}">
+
+        <div style="margin-top:12px">
+            <button>Perform NER</button>
+        </div>
+    </form>
+
+    {% if message %}
+    <div style="margin-top:12px" class="message">{{ message }}</div>
+    {% endif %}
+
+    {% if entities %}
+    <h3 style="margin-top:16px">Entities</h3>
+    <div class="ner-grid">
+        {# entities might be a dict or list; attempt to normalize #}
+        {% set items = [] %}
+        {% if entities is mapping and entities.entities is defined %}
+            {% set items = entities.entities %}
+        {% elif entities is iterable %}
+            {% set items = entities %}
+        {% endif %}
+
+        {% for ent in items %}
+        <div class="ner-card">
+            {% if ent.label is defined %}
+                <h4>{{ ent.label }}</h4>
+            {% elif ent['entity'] is defined %}
+                <h4>{{ ent['entity'] }}</h4>
+            {% else %}
+                <h4>Entity</h4>
+            {% endif %}
+
+            {% if ent.score is defined %}
+                <p>Score: {{ '%.2f'|format(ent.score) }}</p>
+            {% elif ent['score'] is defined %}
+                <p>Score: {{ '%.2f'|format(ent['score']) }}</p>
+            {% endif %}
+
+            {% if ent.text is defined %}
+                <p>{{ ent.text }}</p>
+            {% elif ent['span'] is defined %}
+                <p>{{ ent['span'] }}</p>
+            {% elif ent['start'] is defined %}
+                <p>Range: {{ ent['start'] }} - {{ ent['end'] }}</p>
+            {% else %}
+                <pre>{{ ent }}</pre>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

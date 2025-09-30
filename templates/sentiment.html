@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Sentiment — NLP App{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Sentiment Analysis</h1>
+    <form action="/perform_sentiment" method="post">
+        <label>Text</label>
+        <textarea name="sentiment_text">{{ request.form.sentiment_text or '' }}</textarea>
+        <label>Target (optional)</label>
+        <input type="text" name="sentiment_target" placeholder="e.g. NLP Cloud" value="{{ request.form.sentiment_target or '' }}">
+        <div style="margin-top:12px"><button>Analyze</button></div>
+    </form>
+
+    {% if message %}
+    <div class="message">{{ message }}</div>
+    {% endif %}
+
+    {% if result %}
+    <h3 style="margin-top:12px">Result</h3>
+    <pre>{{ result }}</pre>
+    {% endif %}
+</div>
+{% endblock %}

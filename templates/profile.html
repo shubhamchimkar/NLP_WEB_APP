@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+{% extends 'base.html' %}
+
+{% block title %}Profile — NLP App{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Profile</h1>
+    <p>What would you like to do?</p>
+    <ul>
+        <li><a href="/ner">Named Entity Recognition</a></li>
+        <li><a href="/sentiment">Sentiment Analysis</a></li>
+        <li><a href="/summarization">Summarization</a></li>
+    </ul>
+</div>
+{% endblock %}

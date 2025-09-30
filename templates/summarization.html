@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Summarization — NLP App{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Summarization</h1>
+    <form action="/perform_summarization" method="post">
+        <label>Text to summarize</label>
+        <textarea name="summ_text">{{ request.form.summ_text or '' }}</textarea>
+        <label>Size</label>
+        <select name="size">
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+        </select>
+        <div style="margin-top:12px"><button>Summarize</button></div>
+    </form>
+
+    {% if message %}
+    <div class="message">{{ message }}</div>
+    {% endif %}
+
+    {% if result %}
+    <h3 style="margin-top:12px">Summary</h3>
+    <pre>{{ result }}</pre>
+    {% endif %}
+</div>
+{% endblock %}
